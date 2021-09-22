@@ -129,7 +129,7 @@
                   <v-textarea
                     outlined
                     no-resize
-                    v-model="specificData.notificationDto.context"
+                    v-model="specificData.notificationDto.content"
                     label="推送内容"
                     class="areaclass"
                     height="200px"
@@ -185,7 +185,7 @@
                   }}
                 </p>
                 <p class="card-text item-title">{{ item.title }}</p>
-                <p class="card-text item-content">{{ item.context }}</p>
+                <p class="card-text item-content">{{ item.content }}</p>
                 <p class="card-text item-operator">
                   操作员: {{ item.operator }}
                 </p>
@@ -337,7 +337,7 @@ export default {
     specificDataInit: {
       notificationDto: {
         title: "",
-        context: "",
+        content: "",
         url: "",
       },
       stuTypeFilterDto: {
@@ -351,7 +351,7 @@ export default {
     specificData: {
       notificationDto: {
         title: "",
-        context: "",
+        content: "",
         url: "",
       },
       stuTypeFilterDto: {

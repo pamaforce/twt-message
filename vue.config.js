@@ -1,9 +1,10 @@
 module.exports = {
-  publicPath: './',
-  devServer: {
-    disableHostCheck: true,
-  },
-  transpileDependencies: [
-    'vuetify'
-  ]
+    productionSourceMap: false,
+    publicPath: process.env.NODE_ENV === "production" ? './' : '/',
+    devServer: {
+        disableHostCheck: true,
+    },
+    transpileDependencies: [
+        'vuetify'
+    ]
 }
