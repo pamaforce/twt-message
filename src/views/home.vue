@@ -140,7 +140,7 @@
                     dense
                     outlined
                     label="附加链接(可选)"
-                    v-model="specificData.notificationDto.extra"
+                    v-model="specificData.notificationDto.url"
                     class="areaclass"
                     style="top: -25px"
                   ></v-text-field>
@@ -338,8 +338,7 @@ export default {
       notificationDto: {
         title: "",
         context: "",
-        clickType: "none",
-        extra: "",
+        url: "",
       },
       stuTypeFilterDto: {
         campus: "",
@@ -353,8 +352,7 @@ export default {
       notificationDto: {
         title: "",
         context: "",
-        clickType: "none",
-        extra: "",
+        url: "",
       },
       stuTypeFilterDto: {
         campus: "",
@@ -498,12 +496,6 @@ export default {
         }
       },
     },
-    "specificData.notificationDto.extra": {
-      handler(newVal) {
-        if (newVal != "") this.specificData.notificationDto.clickType = "url";
-        else this.specificData.notificationDto.clickType = "";
-      },
-    },
     sendConfirm: {
       handler(newVal) {
         if (newVal) {
@@ -542,7 +534,8 @@ export default {
                 );
               }
             } else
-              this.specificData.stuTypeFilterDto.departmentId = this.changeMajorSelect.destDepartmentId;
+              this.specificData.stuTypeFilterDto.departmentId =
+                this.changeMajorSelect.destDepartmentId;
             if (this.changeMajorSelect.destMajorId.indexOf(0) != -1) {
               if (this.changeMajorSelect.destDepartmentId.indexOf(0) != -1) {
                 this.specificData.stuTypeFilterDto.majorId = [];
@@ -553,7 +546,8 @@ export default {
                 }
               } else this.specificData.stuTypeFilterDto.majorId = [];
             } else
-              this.specificData.stuTypeFilterDto.majorId = this.changeMajorSelect.destMajorId;
+              this.specificData.stuTypeFilterDto.majorId =
+                this.changeMajorSelect.destMajorId;
 
             notificationSpecific(this.specificData)
               .then(() => {
