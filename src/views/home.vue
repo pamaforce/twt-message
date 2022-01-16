@@ -39,78 +39,111 @@
       <div class="hide-slide">
         <v-tabs v-model="tab">
           <v-tab :href="tabValue" style="display: none"></v-tab>
-          <v-tabs-items v-model="tab" style="background-color: #eceff1">
+          <v-tabs-items
+            v-model="tab"
+            style="background-color: #eceff1"
+            touchless
+          >
             <v-tab-item value="0">
               <v-card tile flat style="position: relative"
                 ><v-card-title class="subtitle" style="top: 0px"
                   >推送对象</v-card-title
                 >
                 <v-form ref="chooseForm" lazy-validation>
-                  <v-select
-                    class="btns btns_1"
-                    :disabled="sendAll"
-                    outlined
-                    dense
-                    label="校区"
-                    v-model="theCampus"
-                    :items="campusItems"
-                    :rules="!sendAll ? rules : []"
-                  ></v-select>
-                  <v-select
-                    class="btns btns_2"
-                    :disabled="sendAll"
-                    outlined
-                    dense
-                    label="年级"
-                    v-model="theGrade"
-                    :items="gradeItems"
-                    item-text="gradeName"
-                    item-value="gradeId"
-                    :rules="!sendAll ? rules : []"
-                    multiple
-                  ></v-select>
-                  <v-select
-                    class="btns btns_3"
-                    :disabled="sendAll"
-                    outlined
-                    dense
-                    label="学生类型"
-                    v-model="theType"
-                    :items="typeItems"
-                    item-text="typeName"
-                    item-value="typeId"
-                    :rules="!sendAll ? rules : []"
-                    multiple
-                  ></v-select>
-                  <v-select
-                    v-model="changeMajorSelect.destDepartmentId"
-                    :disabled="sendAll"
-                    class="btns btns_4"
-                    outlined
-                    dense
-                    label="学院"
-                    :items="department"
-                    item-text="name"
-                    item-value="id"
-                    :rules="!sendAll ? rules : []"
-                    multiple
-                  ></v-select>
-                  <v-select
-                    :disabled="
-                      changeMajorSelect.destDepartmentId == '' || sendAll
-                    "
-                    v-model="changeMajorSelect.destMajorId"
-                    class="btns btns_5"
-                    outlined
-                    dense
-                    label="专业"
-                    :items="major"
-                    item-text="name"
-                    item-value="id"
-                    :rules="!sendAll ? rules : []"
-                    multiple
-                  ></v-select>
-                  <v-select style="display: none"></v-select>
+                  <v-radio-group
+                    v-model="radioGroup"
+                    :column="false"
+                    style="margin: 0"
+                  >
+                    <v-radio
+                      label="推送给指定群体"
+                      :value="1"
+                      class="radios"
+                    ></v-radio
+                    ><v-radio
+                      label="推送给全体成员"
+                      :value="2"
+                      class="radios"
+                    ></v-radio
+                    ><v-radio
+                      label="依据学号推送"
+                      :value="3"
+                      class="radios"
+                    ></v-radio>
+                  </v-radio-group>
+                  <template v-if="radioGroup === 1">
+                    <v-select
+                      class="btns btns_1"
+                      outlined
+                      dense
+                      label="校区"
+                      v-model="theCampus"
+                      :items="campusItems"
+                      :rules="rules"
+                    ></v-select>
+                    <v-select
+                      class="btns btns_2"
+                      outlined
+                      dense
+                      label="年级"
+                      v-model="theGrade"
+                      :items="gradeItems"
+                      item-text="gradeName"
+                      item-value="gradeId"
+                      :rules="rules"
+                      multiple
+                    ></v-select>
+                    <v-select
+                      class="btns btns_3"
+                      outlined
+                      dense
+                      label="学生类型"
+                      v-model="theType"
+                      :items="typeItems"
+                      item-text="typeName"
+                      item-value="typeId"
+                      :rules="rules"
+                      multiple
+                    ></v-select>
+                    <v-select
+                      v-model="changeMajorSelect.destDepartmentId"
+                      class="btns btns_4"
+                      outlined
+                      dense
+                      label="学院"
+                      :items="department"
+                      item-text="name"
+                      item-value="id"
+                      :rules="rules"
+                      multiple
+                    ></v-select>
+                    <v-select
+                      :disabled="changeMajorSelect.destDepartmentId == ''"
+                      v-model="changeMajorSelect.destMajorId"
+                      class="btns btns_5"
+                      outlined
+                      dense
+                      label="专业"
+                      :items="major"
+                      item-text="name"
+                      item-value="id"
+                      :rules="rules"
+                      multiple
+                    ></v-select>
+                    <v-select style="display: none"></v-select>
+                  </template>
+                  <template v-if="radioGroup === 3">
+                    <v-text-field
+                      outlined
+                      v-model="users"
+                      label="用户学号"
+                      hint="若有多个，用分号隔开，分号中英文均可"
+                      class="areaclass"
+                      height="18px"
+                      :rules="usersRules"
+                    >
+                    </v-text-field>
+                  </template>
                   <v-card-title class="subtitle" style="padding-top: 0"
                     >推送标题</v-card-title
                   >
@@ -139,7 +172,7 @@
                   <v-text-field
                     dense
                     outlined
-                    label="附加链接(可选)"
+                    label="附加图片URL(可选)"
                     v-model="specificData.notificationDto.url"
                     class="areaclass"
                     style="top: -25px"
@@ -154,11 +187,6 @@
                       >推送消息</v-btn
                     >
                   </div>
-                  <v-checkbox
-                    class="send-all"
-                    label="推送给全体成员"
-                    v-model="sendAll"
-                  ></v-checkbox>
                 </v-form>
               </v-card>
             </v-tab-item>
@@ -171,7 +199,6 @@
                 v-for="(item, index) in historyData"
                 :key="index"
                 class="contentItems"
-                elevation="1"
               >
                 <p class="card-text item-time">
                   {{
@@ -186,6 +213,9 @@
                 </p>
                 <p class="card-text item-title">{{ item.title }}</p>
                 <p class="card-text item-content">{{ item.content }}</p>
+                <p class="card-text item-content">
+                  <i>{{ item.url }}</i>
+                </p>
                 <p class="card-text item-operator">
                   操作员: {{ item.operator }}
                 </p>
@@ -262,6 +292,7 @@ import {
   notificationAll,
   notificationSpecific,
   notificationHistoryAll,
+  notificationToUser,
 } from "@/api/user.js";
 import { removeToken } from "@/utils/auth";
 export default {
@@ -270,14 +301,15 @@ export default {
     avatar: defaultAvatar,
     username: "请登录",
     realname: "请登录",
+    users: "",
     userNumber: "",
     btnValue: 0,
-    sendAll: false,
     tab: null,
     loader: null,
     loading: false,
     dialog: false,
     sendConfirm: false,
+    radioGroup: 1,
     theCampus: "",
     campusItems: ["全部校区", "卫津路校区", "北洋园校区"],
     theGrade: [],
@@ -380,6 +412,30 @@ export default {
             else return false;
           })(v)) ||
         "请输入",
+    ],
+    usersRules: [
+      (v) =>
+        (v &&
+          (function (x) {
+            if (x.length != 0) return true;
+            else return false;
+          })(v)) ||
+        "请输入",
+      (v) => {
+        let x = [],
+          flag = true;
+        v.split(";").map((item) => {
+          x = x.concat(item.split("；"));
+        });
+        x.map((item) => {
+          if (item) {
+            if (!/^\d{10}$/.test(item)) {
+              flag = false;
+            }
+          }
+        });
+        return flag || "请输入正确的学号集合";
+      },
     ],
   }),
   methods: {
@@ -500,7 +556,7 @@ export default {
       handler(newVal) {
         if (newVal) {
           this.loader = "loading";
-          if (this.sendAll) {
+          if (this.radioGroup === 2) {
             notificationAll(this.specificData.notificationDto)
               .then(() => {
                 Message.success("推送成功！");
@@ -509,8 +565,9 @@ export default {
               })
               .catch((err) => {
                 Message.error(err);
+                this.loader = null;
               });
-          } else {
+          } else if (this.radioGroup === 1) {
             //对用户的选择进行数据处理
             if (this.theCampus == "全部校区")
               this.specificData.stuTypeFilterDto.campus = "";
@@ -557,6 +614,21 @@ export default {
               })
               .catch((err) => {
                 Message.error(err);
+                this.loader = null;
+              });
+          } else if (this.radioGroup === 3) {
+            notificationToUser({
+              ...this.specificData.notificationDto,
+              userNumbers: this.users,
+            })
+              .then(() => {
+                Message.success("推送成功！");
+                this.loader = null;
+                this.dataInit();
+              })
+              .catch((err) => {
+                Message.error(err);
+                this.loader = null;
               });
           }
           this.sendConfirm = false;
@@ -570,8 +642,9 @@ export default {
 <style lang="scss" scoped>
 .header-div {
   position: relative;
-  height: 75px;
+  height: 80px;
   background-color: #f5f5f5;
+  z-index: 9999;
 }
 .bottom-btn {
   width: 50vw;
@@ -579,7 +652,7 @@ export default {
 .twt-title {
   position: absolute;
   left: 12vw;
-  padding-top: 10px;
+  padding-top: 12px;
   padding-left: 90px;
   font-size: 19px;
   text-align: center;
@@ -605,11 +678,6 @@ export default {
   overflow: hidden;
   margin-bottom: 20px;
 }
-.send-all {
-  position: absolute;
-  left: 190px;
-  top: 2px;
-}
 .hide-slide {
   position: relative;
   left: 0px;
@@ -623,6 +691,7 @@ export default {
   height: 100vh;
   left: 12vw;
   width: 76vw;
+  padding: 0 10px;
   overflow: hidden;
 }
 .hide-white {
@@ -637,6 +706,11 @@ export default {
   font-size: 18px;
   position: relative;
   left: 6%;
+}
+.radios {
+  position: relative;
+  left: 7.5%;
+  margin-right: 24px;
 }
 .btns {
   display: inline-block;
@@ -681,15 +755,17 @@ export default {
   top: -25px;
 }
 .contentItems {
-  margin: 0px;
-  margin-bottom: 20px;
+  margin: 5px 10px;
+  margin-bottom: 15px;
+  padding-left: 1.5%;
+  padding-right: 1.5%;
   padding-top: 5px;
   padding-bottom: 5px;
+  box-sizing: border-box !important;
 }
 .card-text {
   font-size: 14px;
   padding-top: 5px;
-  padding-left: 1.5%;
   margin: 0;
 }
 .item-time {
@@ -700,7 +776,7 @@ export default {
   font-weight: 700;
 }
 .item-content {
-  font-weight: 500;
+  font-weight: 400;
 }
 .item-operator {
   font-weight: 400;
@@ -720,6 +796,9 @@ export default {
   }
 }
 @media screen and (max-width: 700px) {
+  .hide-white {
+    height: 65px;
+  }
   .main-view {
     position: relative;
     top: 0px;
@@ -736,17 +815,16 @@ export default {
     height: 100%;
     overflow: auto;
   }
-  .send-all {
-    position: absolute;
-    left: 100px;
-    top: 2px;
-  }
   .second-view {
     position: relative;
     top: 5px;
     left: 8vw;
     width: 84vw;
     margin: 0;
+  }
+  .radios {
+    left: 3.5%;
+    margin-right: 30px;
   }
   .btns {
     display: inline-block;
