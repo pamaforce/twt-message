@@ -99,7 +99,7 @@ export function notificationToUser(data) {
         url: '/notification/toUser',
         method: 'post',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
         data
     })

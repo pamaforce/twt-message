@@ -441,6 +441,7 @@ export default {
   methods: {
     dataInit() {
       //初始化数据
+      this.users = "";
       this.rules = [];
       this.specificData = this.specificDataInit;
       this.theCampus = "";
