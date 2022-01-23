@@ -429,7 +429,7 @@ export default {
         });
         x.map((item) => {
           if (item) {
-            if (!/^\d{10}$/.test(item)) {
+            if (!/^\d{6,10}$/.test(item)) {
               flag = false;
             }
           }
