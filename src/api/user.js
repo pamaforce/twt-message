@@ -112,4 +112,13 @@ export function notificationHistoryAll() {
         method: 'get'
     })
 }
+
+//分页获取历史通知
+export function notificationHistoryPage(params) {
+    return service({
+        url: '/notification/history/page',
+        method: 'get',
+        params
+    })
+}
 // #TODO 对接口进行分类

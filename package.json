@@ -10,8 +10,13 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "crypto-js": "^4.1.1",
     "js-cookie": "^2.2.1",
+    "marked": "^4.0.12",
+    "mavon-editor": "^2.10.4",
+    "save": "^2.4.0",
     "vue": "^2.6.11",
+    "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.5.1",
     "vuetify": "^2.4.6"
   },
