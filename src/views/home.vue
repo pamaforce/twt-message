@@ -197,12 +197,13 @@
           <p class="card-text item-operator">操作员: {{ item.operator }}</p>
         </v-card>
         <p
-          v-if="showData.length < historyData.length"
-          @click="pushData"
+          v-if="haveMore"
+          @click="getHistory"
           style="cursor: pointer; font-size: 14px; text-align: center"
         >
           点击查看更多
         </p>
+        <p v-else style="font-size: 14px; text-align: center">到底啦~</p>
       </template>
     </div>
     <v-bottom-navigation
@@ -271,8 +272,8 @@ import {
   getMajorAll,
   notificationAll,
   notificationSpecific,
-  notificationHistoryAll,
-  //notificationHistoryPage,
+  //notificationHistoryAll,
+  notificationHistoryPage,
   notificationToUser,
 } from "@/api/user.js";
 import { removeToken } from "@/utils/auth";
@@ -288,11 +289,13 @@ export default {
     users: "",
     userNumber: "",
     btnValue: 0,
+    page: 1,
     tab: null,
     loader: null,
     loading: false,
     dialog: false,
     sendConfirm: false,
+    haveMore: true,
     radioGroup: 1,
     theCampus: "",
     campusItems: ["全部校区", "卫津路校区", "北洋园校区"],
@@ -475,9 +478,7 @@ export default {
       let formdata = new FormData();
       formdata.append("file", $file);
       formdata.append("token", this.genUpToken());
-      let instance = axios.create({
-        withCredentials: true,
-      });
+      let instance = axios.create({ withCredentials: false });
       instance.post("https://upload-z1.qiniup.com", formdata).then((res) => {
         if (res.status === 200) {
           let url = "http://pic.pamaforce.xyz/" + res.data.key;
@@ -499,11 +500,9 @@ export default {
         scope: "notice-twt",
         deadline: deadline,
       });
-      console && console.log("put_policy = ", put_policy);
 
       //SETP 3
       var encoded = this.base64encode(this.utf16to8(put_policy));
-      console && console.log("encoded = ", encoded);
 
       //SETP 4
       var hash = cryptoJs.HmacSHA1(
@@ -511,7 +510,6 @@ export default {
         "Drq--AHKz5WMTmiq9RhN8_HLvDLekmEVDnhSanp9"
       );
       var encoded_signed = hash.toString(cryptoJs.enc.Base64);
-      console && console.log("encoded_signed=", encoded_signed);
 
       //SETP 5
       var upload_token =
@@ -519,7 +517,6 @@ export default {
         this.safe64(encoded_signed) +
         ":" +
         encoded;
-      console && console.log("upload_token=", upload_token);
       return upload_token;
     },
     safe64(base64) {
@@ -595,26 +592,43 @@ export default {
     },
     toHistory() {
       //读取历史推送记录
-      notificationHistoryAll().then((res) => {
+      this.page = 1;
+      notificationHistoryPage({ pageSize: 10, pageNum: 1 }).then((res) => {
         this.historyData = res.result;
+        this.page++;
         this.showData = [];
         this.pushData();
       });
     },
+    getHistory() {
+      notificationHistoryPage({ pageSize: 10, pageNum: this.page }).then(
+        (res) => {
+          this.historyData = res.result;
+          this.page++;
+          this.pushData();
+        }
+      );
+    },
     pushData() {
-      if (this.showData.length < this.historyData.length) {
-        this.showData.push(
-          ...(this.historyData.length - this.showData.length > 20
-            ? this.historyData.slice(
-                this.showData.length,
-                this.showData.length + 20
-              )
-            : this.historyData.slice(
-                this.showData.length,
-                this.historyData.length - this.showData.length
-              ))
-        );
+      if (this.historyData.length < 10) {
+        this.haveMore = false;
+      } else {
+        this.haveMore = true;
       }
+      this.showData.push(...this.historyData);
+      // if (this.showData.length < this.historyData.length) {
+      //   this.showData.push(
+      //     ...(this.historyData.length - this.showData.length > 10
+      //       ? this.historyData.slice(
+      //           this.showData.length,
+      //           this.showData.length + 10
+      //         )
+      //       : this.historyData.slice(
+      //           this.showData.length,
+      //           this.historyData.length - this.showData.length
+      //         ))
+      //   );
+      // }
     },
     sendToThem() {
       if (this.specificData.notificationDto.content.length) {
